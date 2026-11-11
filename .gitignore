@@ -1,0 +1,9 @@
+node_modules/
+.venv/
+.npm/
+out/
+work/
+backup/
+*.pyc
+__pycache__/
+.DS_Store

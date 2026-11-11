@@ -1,0 +1,30 @@
+{
+  "composition": {
+    "id": "BridgeShort",
+    "width": 1080,
+    "height": 1920,
+    "fps": 30,
+    "durationInFrames": 2025
+  },
+  "paths": {
+    "entryPoint": "src/index.ts",
+    "publicDir": "public",
+    "kenneyDir": "public/bridge/kenney",
+    "workDir": "work/bridge-short",
+    "defaultVideo": "out/bridge/video.mp4",
+    "defaultFinal": "out/bridge/final.mp4"
+  },
+  "render": {
+    "codec": "h264",
+    "crf": 16,
+    "scale": 1.3333
+  },
+  "assets": {
+    "kenneyModels": [
+      "tree_oak", "tree_default", "tree_detailed", "tree_fat", "tree_cone", "tree-high-round", "tree",
+      "plant_bushLarge", "plant_bushDetailed", "plant_bush", "hedge", "flower_redA", "flower_yellowA",
+      "flower_purpleA", "grass_large", "grass", "lily_large", "lantern", "cart", "stall-red", "stall-green",
+      "stall-bench", "banner-red", "banner-green", "windmill", "canoe"
+    ]
+  }
+}

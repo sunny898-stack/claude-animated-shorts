@@ -1,4 +1,4 @@
-# Claude Animated Shorts
+# Claude Animated Shorts, adapted for Codex
 
 The free Claude skill from the video **"How to Make Viral Animated Shorts Using Claude (Full Workflow)"**.
 
@@ -18,7 +18,22 @@ Proven on **The Bridge That Fell for a Song**, a 67 s short about the 1831 Broug
 | `references/frames/` | 38 full-size reference frames (540x960) to compare your frames against |
 | `references/sheets/` | 20 contact sheets, one per reference short, 60 frames each (1,200 frames) |
 
-## Install
+## Codex setup
+The repository includes a project-scoped Codex skill, project rules, a minimal Remotion host and pinned dependency manifests. From the repository root:
+
+```bash
+npm install
+python3 -m venv .venv
+.venv/bin/python -m pip install -r requirements.txt
+npm run check
+npm run check:runtime
+```
+
+Read `AGENTS.md` and `.agents/skills/cartoon-3d-short/SKILL.md` before creating a short. The strict runtime check remains red until the permitted Kenney GLBs and the current short's `voice.wav` / `words.json` are present.
+
+Preview interactively with `npm run studio`, render stills with `npm run stills -- out/bridge/x_ 100,400 0.5`, and render the configured composition with `npm run render`. Generated work belongs under `work/` and `out/`.
+
+## Claude Code install
 1. Copy this folder to `~/.claude/skills/cartoon-3d-short/` (clone it there, or download the ZIP).
 2. You need [Remotion](https://www.remotion.dev/) with `@remotion/three`, plus Node, Python 3 and ffmpeg.
 3. In Claude Code, say: *"Use the cartoon short skill and make a short about …"*.

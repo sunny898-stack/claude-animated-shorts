@@ -1,6 +1,17 @@
-# Writes out/bridge/shots.json (shot frame ranges, crossfade windows, flash) from story.ts for scripts/short_qa.py.
-import json, re, sys
-src = open(sys.argv[1] if len(sys.argv) > 1 else "src/videos/bridge/story.ts", encoding="utf-8").read()
+# Writes shot frame ranges, crossfade windows and planned effects from story.ts for short_qa.py.
+import argparse
+import json
+import os
+import re
+
+parser = argparse.ArgumentParser()
+parser.add_argument("source", nargs="?", default="src/videos/bridge/story.ts")
+parser.add_argument("--output", help="defaults to out/<video-folder>/shots.json")
+args = parser.parse_args()
+with open(args.source, encoding="utf-8") as handle:
+    src = handle.read()
+video_name = os.path.basename(os.path.dirname(args.source))
+output = args.output or os.path.join("out", video_name, "shots.json")
 shots = [{"id": int(i), "a": int(a), "b": int(b) if b != "TOTAL" else int(re.search(r"TOTAL = (\d+)", src).group(1))}
          for i, a, b in re.findall(r"\{ id: (\d+), a: (\d+), b: (\w+),", src)]
 xf = {int(k): int(v) for k, v in re.findall(r"(\d+): (\d+)", re.search(r"XFADE[^=]*= \{([^}]*)\}", src).group(1))}
@@ -15,5 +26,7 @@ if m:
     for t0, _ in re.findall(r"\[([\w.]+), ([\d.]+)\]", m.group(1)):
         f0 = round((consts[t0] if t0 in consts else float(t0)) * 30)
         kicks.append([f0, f0 + 8])
-json.dump({"shots": shots, "xfade": xfade, "flash": [flash, flash + 4], "planned": cuts + kicks}, open("out/bridge/shots.json", "w"), indent=1)
-print(len(shots), "shots", xfade, flash, "cuts", [c[0] for c in cuts], "kicks", kicks)
+os.makedirs(os.path.dirname(os.path.abspath(output)), exist_ok=True)
+with open(output, "w", encoding="utf-8") as handle:
+    json.dump({"shots": shots, "xfade": xfade, "flash": [flash, flash + 4], "planned": cuts + kicks}, handle, indent=1)
+print(output, len(shots), "shots", xfade, flash, "cuts", [c[0] for c in cuts], "kicks", kicks)

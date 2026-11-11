@@ -1,10 +1,12 @@
-# Merge the four look sandboxes back into the main bridge folder, by owned files.
+# Merge the five look sandboxes back into the main video folder, by owned files.
 # Backs up main first (backup/bridge_<time>/), copies each sandbox's owned files, reports which owned files are
-# missing or unchanged. Usage: python scripts/bridge_merge.py [cam,world,char,post]
-import os, shutil, sys, time, filecmp
+# missing or unchanged.
+import argparse
+import filecmp
+import os
+import shutil
+import time
 
-ROOT = os.path.expanduser("your Remotion project")
-MAIN = os.path.join(ROOT, "src/videos/bridge")
 OWN = {  # round 2 ownership (round 1: world also owned paint/build, post owned grade)
     "cam": ["story.ts"],
     "world": ["world.ts", "lights.ts", "shade.ts", "grade.ts"],
@@ -12,14 +14,26 @@ OWN = {  # round 2 ownership (round 1: world also owned paint/build, post owned 
     "char": ["toon.ts", "cast.ts", "cardshade.ts"],
     "post": ["ink.ts", "Bridge.tsx", "lensblur.ts"],
 }
-which = sys.argv[1].split(",") if len(sys.argv) > 1 else list(OWN)
-bak = os.path.join(ROOT, "backup", time.strftime("bridge_%Y%m%d_%H%M%S"))
-shutil.copytree(MAIN, bak)
+parser = argparse.ArgumentParser()
+parser.add_argument("boxes", nargs="?", default=",".join(OWN), help="comma-separated owners")
+parser.add_argument("--root", default=".", help="Remotion project root")
+parser.add_argument("--name", default="bridge", help="video folder name under src/videos")
+args = parser.parse_args()
+root = os.path.abspath(os.path.expanduser(args.root))
+main = os.path.join(root, "src", "videos", args.name)
+which = args.boxes.split(",")
+unknown = [box for box in which if box not in OWN]
+if unknown:
+    raise SystemExit(f"unknown owners: {', '.join(unknown)}")
+if not os.path.isdir(main):
+    raise SystemExit(f"main video folder does not exist: {main}")
+bak = os.path.join(root, "backup", time.strftime(f"{args.name}_%Y%m%d_%H%M%S"))
+shutil.copytree(main, bak)
 print("backup ->", bak)
 for box in which:
-    src = os.path.join(ROOT, f"src/videos/bridge_{box}")
+    src = os.path.join(root, "src", "videos", f"{args.name}_{box}")
     for f in OWN[box]:
-        a, b = os.path.join(src, f), os.path.join(MAIN, f)
+        a, b = os.path.join(src, f), os.path.join(main, f)
         if not os.path.exists(a):
             print(f"  {box}: {f} not in sandbox (skipped)")
             continue

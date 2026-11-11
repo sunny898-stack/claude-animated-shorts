@@ -2,13 +2,23 @@
 # motion, black-white-frozen-pop detection (ignoring planned flashes and crossfades), per-shot colour stats and 2 s
 # contact sheets (60 frames each, frame numbers burned in for the reviewer only).
 # Usage: python scripts/short_qa.py <video.mp4> <outdir> [shots.json]
-#   shots.json: [{"id":1,"a":0,"b":130}, ...] plus optional {"flash":[130,134], "xfade":[[1131,1137], ...]}
-import json, os, subprocess, sys
+#   shots.json: {"shots":[{"id":1,"a":0,"b":130}, ...], "flash":[130,134], "xfade":[[1131,1137], ...]}
+import argparse
+import json, os, subprocess
 import numpy as np
 from PIL import Image, ImageDraw
 
-vid, out = sys.argv[1], sys.argv[2]
-meta = json.load(open(sys.argv[3])) if len(sys.argv) > 3 else {}
+parser = argparse.ArgumentParser()
+parser.add_argument("video", help="rendered video to inspect")
+parser.add_argument("outdir", help="directory for report, metrics and contact sheets")
+parser.add_argument("shots", nargs="?", help="optional shot metadata JSON")
+args = parser.parse_args()
+vid, out = args.video, args.outdir
+if args.shots:
+    with open(args.shots, encoding="utf-8") as handle:
+        meta = json.load(handle)
+else:
+    meta = {}
 shots = meta.get("shots", [])
 planned = set()
 for a, b in meta.get("xfade", []) + meta.get("planned", []) + ([meta["flash"]] if "flash" in meta else []):
@@ -56,7 +66,10 @@ for i in range(len(diff)):
         run_start = None
 R.append(f"FRAMES {n}; black {black[:20]}; unplanned white {white[:20]}; frozen spans >=12f {frozen[:20]}")
 R.append(f"POPS (unplanned frame-diff spikes > 3x local median): {pops[:40]}")
-R.append(f"MOTION mean diff {diff.mean():.2f}; frames with diff<0.3 (held): {int((diff < 0.3).sum())} ({(diff < 0.3).mean() * 100:.0f}%)")
+if len(diff):
+    R.append(f"MOTION mean diff {diff.mean():.2f}; frames with diff<0.3 (held): {int((diff < 0.3).sum())} ({(diff < 0.3).mean() * 100:.0f}%)")
+else:
+    R.append("MOTION unavailable: the input contains only one frame")
 
 R.append("\nPER SHOT  (luma mean / std / p2 / p98 / saturation mean, medians over the shot)")
 for s in shots or [{"id": 0, "a": 0, "b": n}]:

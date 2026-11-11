@@ -1,0 +1,40 @@
+{
+  "name": "claude-animated-shorts-codex",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Codex-ready Remotion host and reusable skill for the cartoon 3D short templates.",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "studio": "remotion studio src/index.ts",
+    "stills": "node templates/scripts/bridge-stills.mjs",
+    "render": "node scripts/render.mjs",
+    "mux": "node scripts/mux.mjs",
+    "typecheck": "tsc --noEmit",
+    "check:python": "python3 scripts/check_python.py",
+    "check:timeline": "python3 scripts/check_timeline.py",
+    "check:assets": "node scripts/check-project.mjs",
+    "check:runtime": "node scripts/check-project.mjs --strict",
+    "check": "npm run typecheck && npm run check:python && npm run check:timeline && npm run check:assets"
+  },
+  "dependencies": {
+    "@react-three/fiber": "9.1.2",
+    "@react-three/postprocessing": "3.0.4",
+    "@remotion/bundler": "4.0.290",
+    "@remotion/renderer": "4.0.290",
+    "@remotion/three": "4.0.290",
+    "postprocessing": "6.37.2",
+    "react": "19.1.0",
+    "react-dom": "19.1.0",
+    "remotion": "4.0.290",
+    "three": "0.175.0"
+  },
+  "devDependencies": {
+    "@remotion/cli": "4.0.290",
+    "@types/react": "19.1.0",
+    "@types/react-dom": "19.1.1",
+    "typescript": "5.8.3"
+  }
+}
